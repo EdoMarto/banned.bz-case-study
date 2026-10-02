@@ -1,62 +1,58 @@
-# banned.bz – case study
+# banned.bz (case study)
 
-A personal project from 2025 (April to May, about 70 commits): a system that tracked Telegram channels
-spreading illegal content and pushed them through Telegram's reporting process until they were taken
-down.
+A personal project from 2025, built over April and May across roughly 70 commits. It tracked Telegram
+channels that spread illegal content and pushed them through Telegram's reporting process until they got
+taken down.
 
-**This repository documents the project and contains no code.** The reasons are explained
-[below](#why-the-code-is-not-published).
+This repository is a write-up of the project. It contains no code, and the reasons for that are at the
+[bottom](#why-the-code-isnt-here).
 
 ## The problem
 
-Channels that distribute illegal content, such as pirated material, scams and worse, are easy to find on
-Telegram and often stay online for a long time. Reporting one by hand is slow, and a single report
-rarely leads to action. When a channel is closed, a copy usually reappears under a new name within
-hours.
+Channels that hand out illegal content, pirated stuff, scams and worse, are easy to find on Telegram and
+often stay up for a long time. Reporting one by hand is slow, and a single report rarely does anything.
+When a channel does get closed, a copy is usually back under a new name within hours.
 
-## What the system did
+## What it did
 
-The project had three parts:
+There were three parts to it.
 
-- **Control bot** (python-telegram-bot): the operator sent channel links to a private bot and used
-  commands to see the tracked channels, their status and the report history.
-- **Monitoring** (Hydrogram userbot): scheduled jobs checked whether each tracked channel, bot or
-  message was still reachable, and marked it as closed once Telegram removed it. The system also told
-  channels apart from users, bots and single messages, so private accounts were never targeted.
-- **Report drafting** (local LLM through Ollama): for each channel the system wrote a report that
-  described the violation, instead of sending a generic template.
+The control bot (python-telegram-bot) was how I used it: I sent channel links to a private bot, and
+commands let me see the tracked channels, their status and the report history.
 
-Every tracked link and report was stored in SQLite, so the system could tell when a channel had been
-closed and how long it took.
+The monitoring side was a Hydrogram userbot. Scheduled jobs checked whether each tracked channel, bot or
+message was still reachable, and marked it as closed once Telegram had removed it. It also told channels
+apart from users, bots and single messages, so private accounts were never touched.
 
-```
-operator ──► control bot ──► SQLite (links, reports) ◄── status checks (userbot)
-                                     │
-                                     └──► report drafting (LLM) ──► Telegram reporting process
-```
+Report drafting used a local LLM through Ollama. For each channel it wrote a report describing the
+violation, rather than sending the same generic template every time.
 
-## What I learned
+Every link and report went into SQLite, which is what let it tell when a channel had been closed and how
+long that took.
 
-- **Status tracking mattered most.** Knowing which channels were already closed avoided wasted reports
-  and showed how long each takedown took.
-- **Takedowns don't last.** Closed channels came back under new names, so the problem is structural and
-  cannot be solved by reporting alone.
-- **Automation and abuse look the same.** The platform cannot tell automated reports against an illegal
-  channel from the same reports against a legitimate one. This is what made the project work, and it is
-  also why it should not be public.
+## What I took away from it
 
-## Why the code is not published
+The status tracking turned out to be the important part. Knowing which channels were already gone meant
+no wasted reports, and it showed how long each takedown actually took.
 
-The code does not know whether a channel is illegal: it acts on whatever link it is given. Published, it
-would be just as effective at taking down a journalist's channel, a competitor or a person being
-harassed. Automated mass reporting also breaks Telegram's Terms of Service. The source therefore stays
-private.
+Takedowns didn't stick. Closed channels came back under new names, so the real problem is structural and
+you can't fix it by reporting alone.
 
-To report illegal content, use the official channels:
+And the uncomfortable one: automation and abuse look identical. The platform can't tell automated reports
+against an illegal channel from the same reports aimed at a legitimate one. That's exactly what made the
+project work, and it's also why I'm not putting the code out.
 
-- Telegram: [@notoscam](https://t.me/notoscam) for scams, and `abuse@telegram.org`
-- Italy: [Polizia Postale](https://www.commissariatodips.it) for illegal content
+## Why the code isn't here
 
-## Tech stack
+The code has no idea whether a channel is illegal. It acts on whatever link you give it. Out in the open
+it would be just as good at taking down a journalist's channel, a competitor, or someone being harassed.
+Coordinated mass reporting also breaks Telegram's Terms of Service. So the source stays private.
 
-Python · python-telegram-bot · Hydrogram · SQLite · Ollama · Selenium
+If you need to report illegal content, use the official routes:
+
+* Telegram: [@notoscam](https://t.me/notoscam) for scams, and `abuse@telegram.org`
+* Italy: the [Polizia Postale](https://www.commissariatodips.it)
+
+## Built with
+
+Python, python-telegram-bot, Hydrogram, SQLite, Ollama and Selenium.
